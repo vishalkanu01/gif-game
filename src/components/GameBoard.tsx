@@ -52,6 +52,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ gifs, onWin }) => {
   return (
     <div className="h-screen grid grid-cols-4 gap-5 m-4 lg:mx-auto">
       {gifs.map((gif, index) => {
+        const cachedImage = new Image();
+        cachedImage.src = gif.url;
         const isFlipped = selectedCards.includes(index) || matchedCards.includes(index);
 
         return (
@@ -62,7 +64,11 @@ const GameBoard: React.FC<GameBoardProps> = ({ gifs, onWin }) => {
             }`}
             onClick={() => handleCardClick(index)}
           >
-            {isFlipped ? <img src={gif.url} alt={gif.title} /> : <div className="back">?</div>}
+            {isFlipped ? (
+              <img src={cachedImage.src} alt={gif.title} />
+            ) : (
+              <div className="back">?</div>
+            )}
           </div>
         );
       })}
