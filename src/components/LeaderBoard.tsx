@@ -11,12 +11,11 @@ interface LeaderboardProps {
 
 const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard }) => {
   return (
-    <div className="leaderboard">
-      <h2>Leaderboard</h2>
+    <div>
       {leaderboard.map((entry, index) => (
-        <p key={index} className="leaderboard-entry">
+        <div key={index} className="mx-5 text-[#4a5568] text-md m-4">
           {index + 1}. {entry.name} - {entry.score} seconds
-        </p>
+        </div>
       ))}
     </div>
   );
