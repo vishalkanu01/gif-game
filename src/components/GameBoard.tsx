@@ -50,16 +50,24 @@ const GameBoard: React.FC<GameBoardProps> = ({ gifs, onWin }) => {
   }, [matchedCards, gifs.length, onWin, startTime]);
 
   return (
-    <div className="game-board">
+    <div className="grid grid-cols-4 gap-5 m-4 md:h-[80%] lg:mx-auto">
       {gifs.map((gif, index) => {
+        const cachedImage = new Image();
+        cachedImage.src = gif.url;
         const isFlipped = selectedCards.includes(index) || matchedCards.includes(index);
 
         return (
           <div
             key={index}
-            className={`card ${isFlipped ? "flipped" : ""}`}
+            className={`card rounded-lg w-[80px] h-[80px] md:w-[200px] md:h-[200px]  ${
+              isFlipped ? "flipped" : ""
+            }`}
             onClick={() => handleCardClick(index)}>
-            {isFlipped ? <img src={gif.url} alt={gif.title} /> : <div className="back">?</div>}
+            {isFlipped ? (
+              <img src={cachedImage.src} alt={gif.title} />
+            ) : (
+              <div className="back">?</div>
+            )}
           </div>
         );
       })}
