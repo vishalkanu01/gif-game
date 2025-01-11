@@ -1,5 +1,6 @@
-import { LeaderboardEntry } from "@/types";
 import { useState } from "react";
+//
+import { LeaderboardEntry } from "@/types";
 import Leaderboard from "./LeaderBoard";
 
 const LeaderBoardPage = () => {
@@ -12,8 +13,8 @@ const LeaderBoardPage = () => {
 
   return (
     <div className="mt-4">
-      <h2 className="text-gray-400 font-bold text-lg text-center">Leaderboard</h2>
-      <div className="h-screen">
+      <h2 className="text-2xl font-extrabold text-center text-gray-800">Leaderboard</h2>
+      <div>
         <Leaderboard leaderboard={leaderboard} />
       </div>
     </div>

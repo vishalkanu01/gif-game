@@ -3,10 +3,8 @@ import Confetti from "react-confetti";
 //
 import MagnifyingGlassIcon from "@/assets/MaginifyingGlassIcon";
 import "../App.css";
-import { GifResponse, LeaderboardEntry } from "../types";
 import GameBoard from "./GameBoard";
 import Leaderboard from "./LeaderBoard";
-
 import {
   Dialog,
   DialogContent,
@@ -14,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { GifResponse, LeaderboardEntry } from "@/types";
 
 const API_KEY = import.meta.env.VITE_GIPHY_API_KEY;
 
@@ -37,7 +36,7 @@ const HomePage: React.FC = () => {
   const fetchGifs = async () => {
     try {
       const response = await fetch(
-        `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${searchTerm}&limit=8`,
+        `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${searchTerm}&limit=8`
       );
       const data: GifResponse = await response.json();
       const formattedGifs = data.data.map((gif) => ({
@@ -68,7 +67,7 @@ const HomePage: React.FC = () => {
     setLeaderboard(
       [...leaderboard, newEntry]
         .sort((a, b) => a.score - b.score) // Sort by time
-        .slice(0, 10),
+        .slice(0, 10)
     );
     setGameWon(false);
     setGifs([]);
@@ -77,15 +76,44 @@ const HomePage: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="h-full flex flex-col justify-between">
-      {confetti && <Confetti />}
-      {!gifs.length ? (
-        <div className="flex flex-col  h-screen">
-          {/* Search Input */}
-          <div className="flex items-center justify-center mt-20 w-full">
+    <div className="flex flex-col justify-between w-full">
+      {confetti && <Confetti className="w-full" />}
+      {/* Game Won Section */}
+      {gameWon && (
+        <div className="flex flex-col items-center justify-center m-10">
+          <h2 className="mt-4 text-xl font-bold text-center text-gray-400">Submit Your Score</h2>
+          <form
+            className="flex flex-col items-center justify-center w-full gap-4 mt-4 md:flex-row"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target as HTMLFormElement);
+              const name = formData.get("name") as string;
+              submitScore(name, time);
+            }}>
             <input
               type="text"
-              className="mx-6 md:mx-0 w-full md:w-1/3 py-3 px-4 rounded-full text-lg bg-white  focus:outline-none focus:ring focus:ring-red-400"
+              name="name"
+              className="w-full px-4 py-3 text-lg bg-white rounded-full md:w-1/3 focus:outline-none focus:ring focus:ring-red-400"
+              style={{ boxShadow: "0px 1px 8px 0px rgba(0, 0, 0, 0.14)" }}
+              placeholder="Name"
+              required
+            />
+            <button
+              type="submit"
+              className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-400"
+              onClick={() => setIsOpen(true)}>
+              Submit
+            </button>
+          </form>
+        </div>
+      )}
+      {!gifs.length ? (
+        <div className="flex flex-col h-[80%]">
+          {/* Search Input */}
+          <div className="flex items-center justify-center w-full mt-20">
+            <input
+              type="text"
+              className="w-full px-4 py-3 mx-6 text-lg bg-white rounded-full md:mx-0 md:w-1/3 focus:outline-none focus:ring focus:ring-red-400"
               style={{ boxShadow: "0px 1px 8px 0px rgba(0, 0, 0, 0.14)" }}
               placeholder="Search for GIFs..."
               value={searchTerm}
@@ -99,23 +127,21 @@ const HomePage: React.FC = () => {
             <div className="relative">
               <button
                 className="absolute -top-3 right-10 md:right-4 hover:text-gray-600"
-                onClick={fetchGifs}
-              >
+                onClick={fetchGifs}>
                 <MagnifyingGlassIcon className="fill-gray-400" />
               </button>
             </div>
           </div>
 
           {/* Suggestions */}
-          <div className="text-md mt-8 text-center text-gray-400">
+          <div className="mt-8 text-center text-gray-400 text-md">
             <p className="mb-2">Suggestions:</p>
             {suggestionItems.map((item) => (
               <button
                 key={item.value}
-                className="rounded-full bg-white px-4 py-2 m-2 hover:bg-gray-400 hover:text-white"
+                className="px-4 py-2 m-2 bg-white rounded-full hover:bg-gray-400 hover:text-white"
                 style={{ boxShadow: "0px 1px 8px 0px rgba(0, 0, 0, 0.14)" }}
-                onClick={() => setSearchTerm(item.value)}
-              >
+                onClick={() => setSearchTerm(item.value)}>
                 {item.name}
               </button>
             ))}
@@ -124,44 +150,12 @@ const HomePage: React.FC = () => {
       ) : (
         <GameBoard gifs={gifs} onWin={handleWin} />
       )}
-      {/* Game Won Section */}
-      {gameWon && (
-        <div className="m-10 flex flex-col items-center justify-center">
-          <h2 className="text-gray-400 text-center font-bold text-xl mt-4">Submit Your Score</h2>
-          <form
-            className="flex flex-col md:flex-row items-center justify-center gap-4 mt-4 w-full"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.target as HTMLFormElement);
-              const name = formData.get("name") as string;
-              submitScore(name, time);
-            }}
-          >
-            <input
-              type="text"
-              name="name"
-              className="w-full md:w-1/3 py-3 px-4 rounded-full text-lg bg-white focus:outline-none focus:ring focus:ring-red-400"
-              style={{ boxShadow: "0px 1px 8px 0px rgba(0, 0, 0, 0.14)" }}
-              placeholder="Name"
-              required
-            />
-            <button
-              type="submit"
-              className="bg-red-600 hover:bg-red-400 text-white rounded-lg px-6 py-2"
-              onClick={() => setIsOpen(true)}
-            >
-              Submit
-            </button>
-          </form>
-        </div>
-      )}
 
       {/* Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent
-          className="bg-white rounded-lg p-6"
-          style={{ boxShadow: "0px 1px 8px 0px rgba(0, 0, 0, 0.14)" }}
-        >
+          className="p-6 bg-white rounded-lg"
+          style={{ boxShadow: "0px 1px 8px 0px rgba(0, 0, 0, 0.14)" }}>
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-gray-800">Leaderboard</DialogTitle>
             <DialogDescription>
