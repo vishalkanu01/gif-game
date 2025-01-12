@@ -34,10 +34,10 @@ const HomePage: React.FC = () => {
   const [confetti, setConfetti] = useState(false);
   const { addEntry, leaderboard } = useLeaderboardStore();
 
-  const fetchGifs = async () => {
+  const fetchGifs = async (term: string) => {
     try {
       const response = await fetch(
-        `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${searchTerm}&limit=8`
+        `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${term}&limit=8`
       );
       const data: GifResponse = await response.json();
       const formattedGifs = data.data.map((gif) => ({
@@ -71,6 +71,11 @@ const HomePage: React.FC = () => {
 
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleBack = () => {
+    setGifs([]);
+    setSearchTerm("");
+  };
+
   return (
     <div className="flex flex-col justify-between w-full">
       {confetti && <Confetti className="w-full" />}
@@ -85,7 +90,8 @@ const HomePage: React.FC = () => {
               const formData = new FormData(e.target as HTMLFormElement);
               const name = formData.get("name") as string;
               submitScore(name, time);
-            }}>
+            }}
+          >
             <input
               type="text"
               name="name"
@@ -97,7 +103,8 @@ const HomePage: React.FC = () => {
             <button
               type="submit"
               className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-400"
-              onClick={() => setIsOpen(true)}>
+              onClick={() => setIsOpen(true)}
+            >
               Submit
             </button>
           </form>
@@ -116,14 +123,15 @@ const HomePage: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  fetchGifs();
+                  fetchGifs(searchTerm);
                 }
               }}
             />
             <div className="relative">
               <button
                 className="absolute -top-3 right-10 md:right-4 hover:text-gray-600"
-                onClick={fetchGifs}>
+                onClick={() => fetchGifs(searchTerm)}
+              >
                 <MagnifyingGlassIcon className="fill-gray-400" />
               </button>
             </div>
@@ -137,21 +145,23 @@ const HomePage: React.FC = () => {
                 key={item.value}
                 className="px-4 py-2 m-2 bg-white rounded-full hover:bg-gray-400 hover:text-white"
                 style={{ boxShadow: "0px 1px 8px 0px rgba(0, 0, 0, 0.14)" }}
-                onClick={() => setSearchTerm(item.value)}>
+                onClick={() => fetchGifs(item.value)}
+              >
                 {item.name}
               </button>
             ))}
           </div>
         </div>
       ) : (
-        <GameBoard gifs={gifs} onWin={handleWin} />
+        <GameBoard gifs={gifs} onWin={handleWin} onBack={handleBack} />
       )}
 
       {/* Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent
           className="p-6 bg-white rounded-lg"
-          style={{ boxShadow: "0px 1px 8px 0px rgba(0, 0, 0, 0.14)" }}>
+          style={{ boxShadow: "0px 1px 8px 0px rgba(0, 0, 0, 0.14)" }}
+        >
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-gray-800">Leaderboard</DialogTitle>
             <DialogDescription>
