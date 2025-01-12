@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { GifResponse, LeaderboardEntry } from "@/types";
+import useLeaderboardStore from "@/store/leaderboardstore";
 
 const API_KEY = import.meta.env.VITE_GIPHY_API_KEY;
 
@@ -28,10 +29,10 @@ const suggestionItems = [
 const HomePage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [gifs, setGifs] = useState<{ id: string; url: string; title: string }[]>([]);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [gameWon, setGameWon] = useState<boolean>(false);
   const [time, setTime] = useState<number>(0);
   const [confetti, setConfetti] = useState(false);
+  const { addEntry, leaderboard } = useLeaderboardStore();
 
   const fetchGifs = async () => {
     try {
@@ -61,14 +62,9 @@ const HomePage: React.FC = () => {
 
     const newEntry: LeaderboardEntry = {
       name,
-
       score: timeTaken,
     };
-    setLeaderboard(
-      [...leaderboard, newEntry]
-        .sort((a, b) => a.score - b.score) // Sort by time
-        .slice(0, 10)
-    );
+    addEntry(newEntry);
     setGameWon(false);
     setGifs([]);
   };

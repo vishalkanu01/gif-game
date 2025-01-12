@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useEffect } from "react";
 //
-import { LeaderboardEntry } from "@/types";
 import Leaderboard from "./LeaderBoard";
+import useLeaderboardStore from "@/store/leaderboardstore";
 
 const LeaderBoardPage = () => {
-  const [leaderboard] = useState<LeaderboardEntry[]>([
-    { name: "John Doe", score: 30 },
-    { name: "Jane Doe", score: 40 },
-    { name: "Alice", score: 20 },
-    { name: "Bob", score: 25 },
-  ]);
+  const { leaderboard, fetchLeaderboard, isLoading, error } = useLeaderboardStore();
+  useEffect(() => {
+    fetchLeaderboard();
+  }, [fetchLeaderboard]);
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
     <div className="mt-4">
