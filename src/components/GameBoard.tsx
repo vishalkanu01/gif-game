@@ -14,7 +14,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ gifs, onWin, onBack }) => {
   const [matchedCards, setMatchedCards] = useState<number[]>([]);
   const [startTime] = useState<number>(Date.now());
 
-  const FLIP_DELAY = 1000; // Time in milliseconds to reset flipped cards
+  const FLIP_DELAY = 800; // Time in milliseconds to reset flipped cards
 
   const handleCardClick = useCallback(
     (index: number) => {
@@ -22,7 +22,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ gifs, onWin, onBack }) => {
         setSelectedCards((prev) => [...prev, index]);
       }
     },
-    [selectedCards]
+    [selectedCards],
   );
 
   useEffect(() => {

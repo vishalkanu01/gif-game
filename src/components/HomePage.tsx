@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 //
 import MagnifyingGlassIcon from "@/assets/MaginifyingGlassIcon";
@@ -32,7 +32,11 @@ const HomePage: React.FC = () => {
   const [gameWon, setGameWon] = useState<boolean>(false);
   const [time, setTime] = useState<number>(0);
   const [confetti, setConfetti] = useState(false);
-  const { addEntry, leaderboard } = useLeaderboardStore();
+  const { addEntry, leaderboard, fetchLeaderboard } = useLeaderboardStore();
+
+  useEffect(() => {
+    fetchLeaderboard();
+  }, [fetchLeaderboard]);
 
   const fetchGifs = async (term: string) => {
     try {
@@ -78,40 +82,57 @@ const HomePage: React.FC = () => {
     setConfetti(false);
   };
 
+  const handleAllow = (() => {
+    if (leaderboard.length < 10) {
+      return true;
+    }
+    const lastPlaceScore = leaderboard[0]?.score || 0;
+    return time < lastPlaceScore;
+  })();
+
   return (
     <div className="flex flex-col justify-between w-full">
       {confetti && <Confetti className="w-full" />}
       {/* Game Won Section */}
-      {gameWon && (
-        <div className="flex flex-col items-center justify-center m-10">
-          <h2 className="mt-4 text-xl font-bold text-center text-gray-400">Submit Your Score</h2>
-          <form
-            className="flex flex-col items-center justify-center w-full gap-4 mt-4 md:flex-row"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.target as HTMLFormElement);
-              const name = formData.get("name") as string;
-              submitScore(name, time);
-            }}
-          >
-            <input
-              type="text"
-              name="name"
-              className="w-full px-4 py-3 text-lg bg-white rounded-full md:w-1/3 focus:outline-none focus:ring focus:ring-red-400"
-              style={{ boxShadow: "0px 1px 8px 0px rgba(0, 0, 0, 0.14)" }}
-              placeholder="Name"
-              required
-            />
-            <button
-              type="submit"
-              className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-400"
-              onClick={() => setIsOpen(true)}
+      {gameWon &&
+        (handleAllow ? (
+          <div className="flex flex-col items-center justify-center m-10">
+            <h2 className="mt-4 text-xl font-bold text-center text-gray-400">Submit Your Score</h2>
+            <p className="text-xl font-bold text-gray-400">
+              Congratulations : You have completed the game in {time}s
+            </p>
+            <form
+              className="flex flex-col items-center justify-center w-full gap-4 mt-4 md:flex-row"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target as HTMLFormElement);
+                const name = formData.get("name") as string;
+                submitScore(name, time);
+              }}
             >
-              Submit
-            </button>
-          </form>
-        </div>
-      )}
+              <input
+                type="text"
+                name="name"
+                className="w-full px-4 py-3 text-lg bg-white rounded-full md:w-1/3 focus:outline-none focus:ring focus:ring-red-400"
+                style={{ boxShadow: "0px 1px 8px 0px rgba(0, 0, 0, 0.14)" }}
+                placeholder="Name"
+                required
+              />
+              <button
+                type="submit"
+                className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-400"
+                onClick={() => setIsOpen(true)}
+              >
+                Submit
+              </button>
+            </form>
+          </div>
+        ) : (
+          <h2 className="mt-4 text-xl font-bold text-center text-red-600">
+            Your score couldn't beat the last place score of Leaderboard . Keep practicing to
+            improve your time!{" "}
+          </h2>
+        ))}
       {!gifs.length ? (
         <div className="flex flex-col h-[80%]">
           {/* Search Input */}
