@@ -37,7 +37,7 @@ const HomePage: React.FC = () => {
   const fetchGifs = async (term: string) => {
     try {
       const response = await fetch(
-        `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${term}&limit=8`
+        `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${term}&limit=8`,
       );
       const data: GifResponse = await response.json();
       const formattedGifs = data.data.map((gif) => ({
@@ -74,6 +74,8 @@ const HomePage: React.FC = () => {
   const handleBack = () => {
     setGifs([]);
     setSearchTerm("");
+    setGameWon(false);
+    setConfetti(false);
   };
 
   return (
